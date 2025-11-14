@@ -1,11 +1,14 @@
 package pizzeria.spring_la_mia_pizzeria_crud.model;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -43,6 +46,9 @@ public class Pizze {
     
     @Lob
     private String synopsis;
+
+    @OneToMany(mappedBy = "pizza")
+    private List<Offerts> Offerts;
 
     public Integer getId() {
         return id;
@@ -90,6 +96,14 @@ public class Pizze {
 
     public void setSynopsis(String synopsis) {
         this.synopsis = synopsis;
+    }
+
+    public List<Offerts> getOfferts() {
+        return Offerts;
+    }
+
+    public void setOfferts(List<Offerts> offerts) {
+        this.Offerts = offerts;
     }
 
     @Override

@@ -30,6 +30,31 @@
             </div>
         </div>
 
+        <!-- Sezione Offerte -->
+        <div th:if="${pizza} != null" th:object="${pizza}" class="mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="h5 mb-0">Offerte</h3>
+                <a th:href="@{/pizza/{id}/offerts(id=*{id})}" class="btn btn-sm btn-primary">Aggiungi offerta</a>
+            </div>
+
+            <div th:if="*{offerts != null and #lists.size(offerts) > 0}">
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="of : *{offerts}">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div><strong>Inizio:</strong> <span th:text="${of.offertDate}"></span></div>
+                                <div><strong>Fine:</strong> <span th:text="${of.offertDateEnd}"></span></div>
+                                <div th:if="${of.notes}"><strong>Note:</strong> <span th:text="${of.notes}"></span></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="text-muted" th:if="*{offerts == null or #lists.size(offerts) == 0}">
+                Nessuna offerta per questa pizza.
+            </div>
+        </div>
+
         <div th:if="${pizza} == null" class="alert alert-warning">Pizza non trovata.</div>
     </div>
 

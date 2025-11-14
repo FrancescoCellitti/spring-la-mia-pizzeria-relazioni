@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.validation.Valid;
 import pizzeria.spring_la_mia_pizzeria_crud.model.Pizze;
 import pizzeria.spring_la_mia_pizzeria_crud.repository.PizzaRepository;
+import pizzeria.spring_la_mia_pizzeria_crud.model.Offerts;
 
 @Controller
 @RequestMapping("/")
@@ -83,6 +84,16 @@ public class PizzaController {
     public String delete(@PathVariable("id") Integer id){
         repository.deleteById(id);  
         return "redirect:/";
+    }
+
+    @GetMapping("/pizza/{id}/offerts")
+    public String offertsCreateForm(@PathVariable("id") Integer id, Model model) {
+        Pizze pizza = repository.findById(id).orElse(null);
+        Offerts offerts = new Offerts();
+        offerts.setPizza(pizza);
+        model.addAttribute("pizza", pizza);
+        model.addAttribute("Offerts", offerts);
+        return "Offerts/create";
     }
 
 }

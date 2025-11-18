@@ -52,6 +52,17 @@
                 <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="invalid-feedback"></div>
             </div>
 
+            <div class="mb-3">
+                <label for="ingredientIds" class="form-label">Ingredienti</label>
+                <select id="ingredientIds" name="ingredientIds" class="form-select" multiple size="6">
+                    <option th:each="ing : ${ingridients}"
+                            th:value="${ing.id}"
+                            th:selected="${#lists.contains(pizza.ingridients, ing)}"
+                            th:text="${ing.description}"></option>
+                </select>
+                <div class="form-text">Tieni premuto Ctrl (Cmd su Mac) per selezionare più ingredienti.</div>
+            </div>
+
             <button type="submit" class="btn btn-primary">salva</button>
             <a th:href="@{/}" class="btn btn-secondary ms-2">Annulla</a>
         </form>

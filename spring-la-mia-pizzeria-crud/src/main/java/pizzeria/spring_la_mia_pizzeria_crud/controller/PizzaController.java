@@ -1,6 +1,7 @@
 package pizzeria.spring_la_mia_pizzeria_crud.controller;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,12 +18,16 @@ import jakarta.validation.Valid;
 import pizzeria.spring_la_mia_pizzeria_crud.model.Pizze;
 import pizzeria.spring_la_mia_pizzeria_crud.repository.PizzaRepository;
 import pizzeria.spring_la_mia_pizzeria_crud.model.Offerts;
+import pizzeria.spring_la_mia_pizzeria_crud.model.Ingridients;
+import pizzeria.spring_la_mia_pizzeria_crud.repository.IngridientsRepository;
 
 @Controller
 @RequestMapping("/")
 public class PizzaController {
     @Autowired
     private PizzaRepository repository;
+    @Autowired
+    private IngridientsRepository ingridientsRepository;
 
     @GetMapping
     public String index(@RequestParam(value = "q", required = false) String q, Model model) {
@@ -48,46 +53,64 @@ public class PizzaController {
     @GetMapping("/pizza/addPizza")
     public String addForm(Model model) {
         model.addAttribute("pizza", new Pizze());
+        model.addAttribute("ingridients", ingridientsRepository.findAll());
         return "pizza/addPizza";
     }
 
     @PostMapping("/pizza/addPizza")
-    public String create(@Valid @ModelAttribute("pizza") Pizze formPizza, BindingResult bindingResult, Model model) {
+    public String create(@Valid @ModelAttribute("pizza") Pizze formPizza,
+            BindingResult bindingResult,
+            @RequestParam(value = "ingredientIds", required = false) List<Integer> ingredientIds,
+            Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("pizza", formPizza);
+            model.addAttribute("ingridients", ingridientsRepository.findAll());
             return "pizza/addPizza";
         }
 
+        List<Ingridients> selected = ingredientIds != null && !ingredientIds.isEmpty()
+                ? ingridientsRepository.findAllById(ingredientIds)
+                : new ArrayList<>();
+        formPizza.setIngridients(selected);
         repository.save(formPizza);
         return "redirect:/";
     }
 
     @GetMapping("/pizza/modifica/{id}")
-    public String editForm(@PathVariable("id") Integer id, Model model) {
-        Pizze pizza = repository.findById(id).get();
+    public String editForm(@PathVariable("id") int id, Model model) {
+        Pizze pizza = repository.findById(id).orElse(null);
         model.addAttribute("pizza", pizza);
+        model.addAttribute("ingridients", ingridientsRepository.findAll());
         return "pizza/modify"; // template: templates/pizza/modify.html
     }
 
     @PostMapping("/pizza/modifica/{id}")
-    public String update(@PathVariable("id") Integer id, @Valid @ModelAttribute("pizza") Pizze formPizza,
-            BindingResult bindingResult, Model model) {
+    public String update(@PathVariable("id") int id,
+            @Valid @ModelAttribute("pizza") Pizze formPizza,
+            BindingResult bindingResult,
+            @RequestParam(value = "ingredientIds", required = false) List<Integer> ingredientIds,
+            Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("ingridients", ingridientsRepository.findAll());
             return "pizza/modify";
         }
 
-         repository.save(formPizza);
+        List<Ingridients> selected = ingredientIds != null && !ingredientIds.isEmpty()
+                ? ingridientsRepository.findAllById(ingredientIds)
+                : new ArrayList<>();
+        formPizza.setIngridients(selected);
+        repository.save(formPizza);
         return "redirect:/";
     }
 
     @PostMapping("/pizza/delete/{id}")
-    public String delete(@PathVariable("id") Integer id){
+    public String delete(@PathVariable("id") int id){
         repository.deleteById(id);  
         return "redirect:/";
     }
 
     @GetMapping("/pizza/{id}/offerts")
-    public String offertsCreateForm(@PathVariable("id") Integer id, Model model) {
+    public String offertsCreateForm(@PathVariable("id") int id, Model model) {
         Pizze pizza = repository.findById(id).orElse(null);
         Offerts offerts = new Offerts();
         offerts.setPizza(pizza);

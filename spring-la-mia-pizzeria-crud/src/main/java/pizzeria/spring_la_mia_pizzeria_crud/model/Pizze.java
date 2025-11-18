@@ -9,9 +9,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+
 
 @Entity
 @Table(name="pizzas")
@@ -49,6 +53,14 @@ public class Pizze {
 
     @OneToMany(mappedBy = "pizza")
     private List<Offerts> Offerts;
+
+    @ManyToMany
+    @JoinTable(
+        name = "pizza_ingredients",
+        joinColumns = @JoinColumn(name = "pizza_id"),
+        inverseJoinColumns = @JoinColumn(name = "ingredient_id")
+    )
+    private List<Ingridients> ingridients;
 
     public Integer getId() {
         return id;
@@ -109,5 +121,13 @@ public class Pizze {
     @Override
     public String toString(){
         return String.format("%s %s %.2f", this.name, this.description, this.price);
+    }
+
+    public List<Ingridients> getIngridients() {
+        return ingridients;
+    }
+
+    public void setIngridients(List<Ingridients> ingridients) {
+        this.ingridients = ingridients;
     }
 }

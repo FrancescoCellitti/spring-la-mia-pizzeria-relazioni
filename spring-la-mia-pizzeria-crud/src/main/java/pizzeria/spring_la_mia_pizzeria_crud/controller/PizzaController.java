@@ -3,40 +3,34 @@ package pizzeria.spring_la_mia_pizzeria_crud.controller;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import pizzeria.spring_la_mia_pizzeria_crud.model.Pizze;
-import pizzeria.spring_la_mia_pizzeria_crud.repository.PizzaRepository;
 import pizzeria.spring_la_mia_pizzeria_crud.model.Offerts;
 import pizzeria.spring_la_mia_pizzeria_crud.model.Ingridients;
+import pizzeria.spring_la_mia_pizzeria_crud.repository.PizzaRepository;
 import pizzeria.spring_la_mia_pizzeria_crud.repository.IngridientsRepository;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("") // controller per le pagine HTML (Thymeleaf)
 public class PizzaController {
-    @Autowired
-    private PizzaRepository repository;
-    @Autowired
-    private IngridientsRepository ingridientsRepository;
+
+    private final PizzaRepository repository;
+    private final IngridientsRepository ingridientsRepository;
+
+    public PizzaController(PizzaRepository repository, IngridientsRepository ingridientsRepository) {
+        this.repository = repository;
+        this.ingridientsRepository = ingridientsRepository;
+    }
 
     @GetMapping
     public String index(@RequestParam(value = "q", required = false) String q, Model model) {
-        List<Pizze> pizze;
-        if (q != null && !q.isBlank()) {
-            pizze = repository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(q, q);
-        } else {
-            pizze = repository.findAll();
-        }
+        List<Pizze> pizze = (q != null && !q.isBlank())
+                ? repository.findByNameContainingIgnoreCase(q)
+                : repository.findAll();
 
         model.addAttribute("pizze", pizze);
         model.addAttribute("q", q);
@@ -45,7 +39,7 @@ public class PizzaController {
 
     @GetMapping("/pizza/{id}")
     public String show(@PathVariable("id") Integer id, Model model) {
-        Pizze pizza = repository.findById(id).get();
+        Pizze pizza = repository.findById(id).orElse(null);
         model.addAttribute("pizza", pizza);
         return "pizza/show";
     }
@@ -59,16 +53,9 @@ public class PizzaController {
 
     @PostMapping("/pizza/addPizza")
     public String create(@Valid @ModelAttribute("pizza") Pizze formPizza,
-            BindingResult bindingResult,
             @RequestParam(value = "ingredientIds", required = false) List<Integer> ingredientIds,
             Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("pizza", formPizza);
-            model.addAttribute("ingridients", ingridientsRepository.findAll());
-            return "pizza/addPizza";
-        }
-
-        List<Ingridients> selected = ingredientIds != null && !ingredientIds.isEmpty()
+        List<Ingridients> selected = (ingredientIds != null && !ingredientIds.isEmpty())
                 ? ingridientsRepository.findAllById(ingredientIds)
                 : new ArrayList<>();
         formPizza.setIngridients(selected);
@@ -81,21 +68,15 @@ public class PizzaController {
         Pizze pizza = repository.findById(id).orElse(null);
         model.addAttribute("pizza", pizza);
         model.addAttribute("ingridients", ingridientsRepository.findAll());
-        return "pizza/modify"; // template: templates/pizza/modify.html
+        return "pizza/modify";
     }
 
     @PostMapping("/pizza/modifica/{id}")
     public String update(@PathVariable("id") int id,
             @Valid @ModelAttribute("pizza") Pizze formPizza,
-            BindingResult bindingResult,
             @RequestParam(value = "ingredientIds", required = false) List<Integer> ingredientIds,
             Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("ingridients", ingridientsRepository.findAll());
-            return "pizza/modify";
-        }
-
-        List<Ingridients> selected = ingredientIds != null && !ingredientIds.isEmpty()
+        List<Ingridients> selected = (ingredientIds != null && !ingredientIds.isEmpty())
                 ? ingridientsRepository.findAllById(ingredientIds)
                 : new ArrayList<>();
         formPizza.setIngridients(selected);
@@ -104,8 +85,8 @@ public class PizzaController {
     }
 
     @PostMapping("/pizza/delete/{id}")
-    public String delete(@PathVariable("id") int id){
-        repository.deleteById(id);  
+    public String delete(@PathVariable("id") int id) {
+        repository.deleteById(id);
         return "redirect:/";
     }
 
@@ -118,5 +99,4 @@ public class PizzaController {
         model.addAttribute("Offerts", offerts);
         return "Offerts/create";
     }
-
 }

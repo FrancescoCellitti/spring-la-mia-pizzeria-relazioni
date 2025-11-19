@@ -1,6 +1,4 @@
--- import.sql for Hibernate
--- This file inserts 10 example pizzas into the `pizzas` table.
--- Place under src/main/resources so Hibernate will execute it after schema generation
+
 
 INSERT INTO pizzas (name, description, image, price, synopsis) VALUES ('Margherita', 'Pomodoro, mozzarella, basilico', 'margherita.jpg', 6.50, 'La classica pizza napoletana con pomodoro fresco e basilico.');
 INSERT INTO pizzas (name, description, image, price, synopsis) VALUES ('Marinara', 'Pomodoro, aglio, origano', 'marinara.jpg', 5.50, 'Semplice e saporita: pomodoro, aglio e origano.');
@@ -13,4 +11,3 @@ INSERT INTO pizzas (name, description, image, price, synopsis) VALUES ('Tonno e 
 INSERT INTO pizzas (name, description, image, price, synopsis) VALUES ('Bufalina', 'Pomodoro, mozzarella di bufala, basilico', 'bufalina.jpg', 10.00, 'Mozzarella di bufala DOP per un gusto superiore.');
 INSERT INTO pizzas (name, description, image, price, synopsis) VALUES ('Ortolana', 'Mozzarella, pomodorini, rucola, scaglie di parmigiano', 'ortolana.jpg', 9.00, 'Fresca con rucola e scaglie di formaggio.');
 
--- End of import.sql
